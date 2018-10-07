@@ -1,0 +1,30 @@
+import requests
+import bs4
+import re
+
+def refine_text(text):
+    text = text.strip('\n\t')
+    text = text.replace('\n','').replace('\t','')
+    text = re.sub('/?[\w]+@[\w].+','',text)
+    return text
+
+def refine_date(ctime):
+    date = re.sub('[ㄱ-힣]+|\d+[|]\d+','',ctime)
+
+    return date
+
+#정보 제공처
+
+def get_url_infofrom_List(data,page):
+    List = []
+    for i in range(1,page+1):
+        url = "http://news.naver.com/main/list.nhn?mode=LSD&mid=sec&sid1=001&date={}&page={}".format(date,i)
+        response = requests.get(url)
+        html = bs4.BeautifulSoup(responce.text,'html.parser')
+        newsList = html.select("table tr td.content ul li")
+        for news in newsList:
+            newsURL = news.find('dt',{"class":""}).select_one("a").get("href")
+            infoFrom = news.select_one("dd span.writing").text
+            List.append([newsURL,infoFrom])
+
+    return List
